@@ -5,10 +5,7 @@
  * Date: 13/12/2017
  * Time: 09:54
  */
-$myObj = null;
-$myObj->name = "John";
-$myObj->age = 30;
-$myObj->city = "New York";
+$myObj = array("John", "Mary", "Peter", "Sally");
 
 $myJSON = json_encode($myObj);
 

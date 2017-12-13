@@ -21,24 +21,35 @@ if ($erp_conn->connect_error) {
     die("Connection failed: " . $erp_conn->connect_error);
 }
 
-// Only get products that haven't been checked
-$sql = "SELECT * from products where id NOT IN (select product_id from `linkyu_ikebois_app_db`.`conformite`)";
-$result = $erp_conn->query($sql);
 
-$products = array();
+if(isset($_GET['id']) && isset($_GET['conforme'])) {
+    $req = "INSERT INTO conformite (product_id, is_conform) VALUES (".$_GET['id'].", ".$_GET['conforme'].")";
+    if ($res = $app_conn->query($req)) {
+        header("HTTP/1.1 200 OK");
+    } else {
+        header("HTTP/1.1 500 Internal Server Error");
+    }
 
-while($row = $result->fetch_assoc()) {
-    array_push($products, array(
-        "id"    =>  $row["id"],
-        "name"  =>  $row["name"],
-        "code"  =>  $row["code"]
-    ));
+} else {
+    // Only get products that haven't been checked
+    $sql = "SELECT * from products where id NOT IN (select product_id from `linkyu_ikebois_app_db`.`conformite`)";
+    $result = $erp_conn->query($sql);
+
+    $products = array();
+
+    while($row = $result->fetch_assoc()) {
+        array_push($products, array(
+            "id"    =>  $row["id"],
+            "name"  =>  $row["name"],
+            "code"  =>  $row["code"]
+        ));
+    }
+
+    $myJSON = json_encode($products);
+
+    header('Content-Type: application/json');
+    echo $myJSON;
 }
-
-$myJSON = json_encode($products);
-
-header('Content-Type: application/json');
-echo $myJSON;
 
 $erp_conn->close();
 $app_conn->close();
